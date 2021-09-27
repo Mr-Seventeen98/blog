@@ -1,0 +1,30 @@
+post:
+  title: No Title
+  created: Created
+  updated: Updated
+  wordcount: Word Count
+  min2read: Reading time
+  min2read_unit: min
+  visitors: Visitors
+  toc: Catalog
+
+search:
+  title: Local Search
+  input: Search the article
+
+rightside:
+  direct_comments: Direct comments
+  back_to_top: Back To Top
+  settings: Settings
+  dark: Dark/Light
+
+copyright:
+  author: Authorship
+  article_url: Article Links
+  notice: Copyright
+
+footer:
+  framework: Framework
+  theme: Theme
+
+article-count: Article Overview
