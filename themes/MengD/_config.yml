@@ -96,11 +96,12 @@ copyright:
 
 # 评论
 ## 注意大小写
-comments: waline # twikoo / waline / valine
+comments: twikoo # twikoo / waline / valine
 
 # valine
 ## https://valine.js.org/
 valine:
+  enable: false # 是否开启
   source: https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js
   appid: qvkfxxxxxxxxxxxxxxxxxxxxxbMMI # 你的 leancloud app id
   appkey: WOURxxxxxxxxxxxxxxxxxWJrog # 你的 leancloud app key
@@ -117,6 +118,7 @@ valine:
 # waline
 ## https://waline.js.org
 waline:
+  enable: false # 是否开启
   source: //cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js
   serverURL: https://waline.vercel.app/ # 服务端地址
   placeholder: 快来评论吧!! #评论框占位符
