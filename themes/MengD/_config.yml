@@ -46,7 +46,7 @@ amusing_title:
 # 自动截取
 description:
   line: 3 # 显示多少行后出现省略号(...)
-  length: 450 # 截取多少字
+  length: 50 # 截取多少字
 
 # 图片懒加载
 lazyload:
