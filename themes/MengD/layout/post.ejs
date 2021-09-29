@@ -46,11 +46,9 @@
   </div>
   <%# 版权 %> 
   <% 
-  var url = `${config.url}/${page.path}` // 文章地址
-  var licenses = theme.copyright.licenses.split("||") // 版权许可
+  var url = `${config.url}/${page.path}` // 文章地址  
   var title = theme.copyright.title||config.title // 网站标题
   var mail = theme.copyright.mail // 作者邮箱
-  var description = theme.copyright.description.split("||")
   var author = theme.copyright.author||config.author // 作者
   %> 
 <% if (theme.copyright.enable){ %>
@@ -60,7 +58,7 @@
       <div class="post_copyright_author">
           <span class="post_copyright_meta"><%-__('copyright.author')%>: </span>
             <span class="post_copyright_info">
-              <a href="mailto:<%- mail %>" ><%- author%></a>
+              <a href="#" ><%- author%></a>
             </span>
       </div>
       <div class="post_copyright_type">
@@ -70,9 +68,8 @@
             </span>
       </div><div class="post_copyright_notice">
           <span class="post_copyright_meta"><%-__('copyright.notice')%>: </span>
-            <span class="post_copyright_info"><%-description[0]%>
-              <a href="<%= licenses[1] %> " target="_blank" >
-                  <%= licenses[0] %> </a> <%-description[1]%>
+            <span class="post_copyright_info">
+              本博客所有文章除特别声明外，转载请注明来自
               <a href="<%= url %>" target="_blank" ><%-title%></a>
               ！</span>
       </div>
