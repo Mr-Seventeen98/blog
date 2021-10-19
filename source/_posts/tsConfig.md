@@ -21,6 +21,32 @@ TypeSrcipt 编译上下文，可以用它来给文件分组，告诉 TypeScript 
 
 在项目的根目录下创建一个名为 tsconfig.json 的空 JSON 文件。通过这种方式，TypeScript 将 会把此目录和子目录下的所有 .ts 文件作为编译上下文的一部分，它还会包含一部分默认的编译选项。
 
+#### 基本选项
+
+###### Files
+Files：指定要包含在程序中的文件列表。如果找不到任何文件，则会抛异常。
+```json
+"files": [
+    "core.ts",
+    "sys.ts",
+    "types.ts",
+    "scanner.ts",
+    "parser.ts",
+    "utilities.ts",
+    "binder.ts",
+    "checker.ts",
+    "tsc.ts"
+  ]
+```
+**当只有少量文件并且不需要使用[glob](https://github.com/isaacs/node-glob)来匹配文件时，这很有用。如果需要，请使用include。**
+
+###### Extends
+extends 的值是一个字符串，其中包含要继承的另一个配置文件的路径。路径可以使用 Node.js 样式解析。
+基础文件中的配置首先加载，然后被继承配置文件中的配置覆盖。在配置文件中找到的所有相对路径都将相对于它们起源的配置文件进行解析。
+值得注意的是，继承配置文件中的`files`，`include`和`exclude`属性会覆盖父级配置文件中的相应属性，并且不允许配置文件之间存在循环关系。
+目前，唯一被排除在继承之外的顶级属性是`references`。
+
+
 #### 编译选项
 
 可以通过 compilerOptions 来定制你的编译选项：
@@ -50,16 +76,57 @@ module：指定使用模块: 'commonjs', 'amd', 'system', 'umd' or 'es2015'
 ```json
 "module": "commonjs",
 ```
+###### lib
+lib：指定要包含在编译中的库文件
+```json
+"lib": [
+  "dome",
+  "es6"
+],
+```
+
+###### allowJs
+allowJs：指定是否允许编译JS文件，默认false,即不编译JS文件
+```json
+"allowJs": true,
+```
+
+###### checkJs
+checkJs：指定是否检查和报告JS文件中的错误，默认false
+```json
+"checkJs": true,
+```
+
+###### jsx
+jsx：指定jsx代码用于的开发环境:'preserve','react-native',or 'react
+```json
+"jsx": "preserve",
+```
+
+###### declaration
+declaration：指定是否在编译的时候生成相的d.ts声明文件，如果设为true,编译每个ts文件之后会生成一个js文件和一个声明文件，但是declaration和allowJs不能同时设为true
+```json
+"declaration": true,
+```
+
+###### declarationMap
+declarationMap：指定编译时是否生成.map文件
+```json
+"declarationMap": true,
+```
+
+###### sourceMap
+sourceMap：
+```json
+"sourceMap": true, // 生成相应的 '.map' 文件
+```
+
+
+
 
 {
 "compilerOptions": {
 'ES2016', 'ES2017', or 'ESNEXT'
-"lib": [], // 指定要包含在编译中的库文件
-"allowJs": true, // 允许编译 javascript 文件
-"checkJs": true, // 报告 javascript 文件中的错误
-"jsx": "preserve", // 指定 jsx 代码的生成: 'preserve', 'react-native', or 'react'
-"declaration": true, // 生成相应的 '.d.ts' 文件
-"sourceMap": true, // 生成相应的 '.map' 文件
 "outFile": "./", // 将输出文件合并为一个文件
 "outDir": "./", // 指定输出目录
 "rootDir": "./", // 用来控制输出目录结构 --outDir.
