@@ -46,6 +46,74 @@ extends 的值是一个字符串，其中包含要继承的另一个配置文件
 值得注意的是，继承配置文件中的`files`，`include`和`exclude`属性会覆盖父级配置文件中的相应属性，并且不允许配置文件之间存在循环关系。
 目前，唯一被排除在继承之外的顶级属性是`references`。
 
+`configs/base.json:`
+```json
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}
+```
+`tsconfig.json:`
+```json
+{
+  "extends": "./configs/base",
+  "files": ["main.ts", "supplemental.ts"]
+}
+```
+`tsconfig.nostrictnull.json:`
+```json
+{
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "strictNullChecks": false
+  }
+}
+```
+在配置文件中找到的具有相对路径的属性（未从继承中排除）将相对于它们起源的配置文件进行解析。
+
+###### Include
+Include：指定要包含在程序中的文件名或模块数组。这些文件名是相对于 tsconfig.json 文件的目录解析的。
+```json
+{
+  "include": ["src/**/*", "tests/**/*"]
+}
+```
+结果
+```json
+.
+├── scripts                ⨯
+│   ├── lint.ts            ⨯
+│   ├── update_deps.ts     ⨯
+│   └── utils.ts           ⨯
+├── src                    ✓
+│   ├── client             ✓
+│   │    ├── index.ts      ✓
+│   │    └── utils.ts      ✓
+│   ├── server             ✓
+│   │    └── index.ts      ✓
+├── tests                  ✓
+│   ├── app.test.ts        ✓
+│   ├── utils.ts           ✓
+│   └── tests.d.ts         ✓
+├── package.json
+├── tsconfig.json
+└── yarn.lock
+```
+`include`和`exclude`支持通配符来全局匹配：
+`*` 匹配零个或多个字符（不包括目录分隔符）
+`?` 匹配任何一个字符（不包括目录分隔符）
+`**/` 匹配嵌套到任何级别的任何目录
+如果全局匹配模式不包含文件扩展名，则仅支持默认扩展名的文件（例如，默认情况下为 .ts、.tsx 和 .d.ts，如果 allowJs 设置为 true，则为 .js 和 .jsx）。
+
+###### Exclude
+指定解析`include`时应屏蔽的文件名或模块数组。
+重要提示：仅屏蔽`include`设置而包含的文件的更改。代码中的`import`语句、`types`、`/// <reference` 指令或在文件列表中指定，`exclude`指定的文件仍然可以成为代码库的一部分。
+它不是一种阻止文件被包含在代码库中的机制——它只是改变了包含设置发现的内容。
+
+###### References
+References：是一种将 TypeScript 程序组织成更小的部分的方法。使用`References`可以大大缩短构建和编辑器的交互时间，强制组件之间的逻辑分离，并以更合理的方式来组织代码。
 
 #### 编译选项
 
