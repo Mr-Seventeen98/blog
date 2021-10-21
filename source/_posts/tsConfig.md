@@ -24,7 +24,9 @@ TypeSrcipt 编译上下文，可以用它来给文件分组，告诉 TypeScript 
 #### 基本选项
 
 ###### Files
+
 Files：指定要包含在程序中的文件列表。如果找不到任何文件，则会抛异常。
+
 ```json
 "files": [
     "core.ts",
@@ -38,15 +40,18 @@ Files：指定要包含在程序中的文件列表。如果找不到任何文件
     "tsc.ts"
   ]
 ```
-**当只有少量文件并且不需要使用[glob](https://github.com/isaacs/node-glob)来匹配文件时，这很有用。如果需要，请使用include。**
+
+**当只有少量文件并且不需要使用[glob](https://github.com/isaacs/node-glob)来匹配文件时，这很有用。如果需要，请使用 include。**
 
 ###### Extends
+
 extends 的值是一个字符串，其中包含要继承的另一个配置文件的路径。路径可以使用 Node.js 样式解析。
 基础文件中的配置首先加载，然后被继承配置文件中的配置覆盖。在配置文件中找到的所有相对路径都将相对于它们起源的配置文件进行解析。
 值得注意的是，继承配置文件中的`files`，`include`和`exclude`属性会覆盖父级配置文件中的相应属性，并且不允许配置文件之间存在循环关系。
 目前，唯一被排除在继承之外的顶级属性是`references`。
 
 `configs/base.json:`
+
 ```json
 {
   "compilerOptions": {
@@ -55,14 +60,18 @@ extends 的值是一个字符串，其中包含要继承的另一个配置文件
   }
 }
 ```
+
 `tsconfig.json:`
+
 ```json
 {
   "extends": "./configs/base",
   "files": ["main.ts", "supplemental.ts"]
 }
 ```
+
 `tsconfig.nostrictnull.json:`
+
 ```json
 {
   "extends": "./tsconfig",
@@ -71,16 +80,21 @@ extends 的值是一个字符串，其中包含要继承的另一个配置文件
   }
 }
 ```
+
 在配置文件中找到的具有相对路径的属性（未从继承中排除）将相对于它们起源的配置文件进行解析。
 
 ###### Include
+
 Include：指定要包含在程序中的文件名或模块数组。这些文件名是相对于 tsconfig.json 文件的目录解析的。
+
 ```json
 {
   "include": ["src/**/*", "tests/**/*"]
 }
 ```
+
 结果
+
 ```json
 .
 ├── scripts                ⨯
@@ -101,6 +115,7 @@ Include：指定要包含在程序中的文件名或模块数组。这些文件�
 ├── tsconfig.json
 └── yarn.lock
 ```
+
 `include`和`exclude`支持通配符来全局匹配：
 `*` 匹配零个或多个字符（不包括目录分隔符）
 `?` 匹配任何一个字符（不包括目录分隔符）
@@ -108,21 +123,85 @@ Include：指定要包含在程序中的文件名或模块数组。这些文件�
 如果全局匹配模式不包含文件扩展名，则仅支持默认扩展名的文件（例如，默认情况下为 .ts、.tsx 和 .d.ts，如果 allowJs 设置为 true，则为 .js 和 .jsx）。
 
 ###### Exclude
+
 指定解析`include`时应屏蔽的文件名或模块数组。
 重要提示：仅屏蔽`include`设置而包含的文件的更改。代码中的`import`语句、`types`、`/// <reference` 指令或在文件列表中指定，`exclude`指定的文件仍然可以成为代码库的一部分。
 它不是一种阻止文件被包含在代码库中的机制——它只是改变了包含设置发现的内容。
 
 ###### References
+
 References：是一种将 TypeScript 程序组织成更小的部分的方法。使用`References`可以大大缩短构建和编辑器的交互时间，强制组件之间的逻辑分离，并以更合理的方式来组织代码。
 
 #### 编译选项
 
 可以通过 compilerOptions 来定制你的编译选项：
+编译选项按照功能可以分为以下几大类
+
+- Type Checking（类型检测）
 
 ```json
 {
   "compilerOptions": {
     // 配置项.....
+  }
+}
+```
+
+##### Type Checking
+
+类型检测的相关配置详解
+
+###### `allowUnreachableCode`
+
+allowUnreachableCode：是否允许出现无法访问的代码
+可选值：
+
+- `undefined` `默认值` 向编辑提供建议作为警告
+- `true` 忽略无法访问的代码
+- `false` 使用无法访问的代码时编译报错
+  从以下示例可以看出这些警告与`javaScript` 语法没有有关系，而是与无法访问的代码有关系
+
+```javascript
+function fn(n: number) {
+  if (n > 5) {
+    return true;
+  } else {
+    return false;
+  }
+  return true;
+}
+```
+
+当 `allowUnreachableCode`配置为 `false`时:
+
+```javascript
+function fn(n: number) {
+  if (n > 5) {
+    return true;
+  } else {
+    return false;
+  }
+  return true; // 检测到无法访问的代码
+}
+```
+
+检测到无法访问的代码这个错误会导致代码的正常运行。
+
+###### `allowUnusedLabels`
+
+allowUnusedLabels：是否运行使用未定义的字段
+可选值：
+
+- `undefined` `默认值` 向编辑提供建议作为警告
+- `true` 忽略未定义的字段
+- `false` 使用未定义的字段的时候编译报错
+  `字段在javaScript中很少见，通常是使用对象字面量`
+
+```javascript
+function verifyAge(age: number) {
+  // Forgot 'return' statement
+  if (age > 18) {
+    verified: true; // 未定义verified字段
   }
 }
 ```
@@ -144,8 +223,11 @@ module：指定使用模块: 'commonjs', 'amd', 'system', 'umd' or 'es2015'
 ```json
 "module": "commonjs",
 ```
+
 ###### lib
+
 lib：指定要包含在编译中的库文件
+
 ```json
 "lib": [
   "dome",
@@ -154,43 +236,52 @@ lib：指定要包含在编译中的库文件
 ```
 
 ###### allowJs
-allowJs：指定是否允许编译JS文件，默认false,即不编译JS文件
+
+allowJs：指定是否允许编译 JS 文件，默认 false,即不编译 JS 文件
+
 ```json
 "allowJs": true,
 ```
 
 ###### checkJs
-checkJs：指定是否检查和报告JS文件中的错误，默认false
+
+checkJs：指定是否检查和报告 JS 文件中的错误，默认 false
+
 ```json
 "checkJs": true,
 ```
 
 ###### jsx
-jsx：指定jsx代码用于的开发环境:'preserve','react-native',or 'react
+
+jsx：指定 jsx 代码用于的开发环境:'preserve','react-native',or 'react
+
 ```json
 "jsx": "preserve",
 ```
 
 ###### declaration
-declaration：指定是否在编译的时候生成相的d.ts声明文件，如果设为true,编译每个ts文件之后会生成一个js文件和一个声明文件，但是declaration和allowJs不能同时设为true
+
+declaration：指定是否在编译的时候生成相的 d.ts 声明文件，如果设为 true,编译每个 ts 文件之后会生成一个 js 文件和一个声明文件，但是 declaration 和 allowJs 不能同时设为 true
+
 ```json
 "declaration": true,
 ```
 
 ###### declarationMap
-declarationMap：指定编译时是否生成.map文件
+
+declarationMap：指定编译时是否生成.map 文件
+
 ```json
 "declarationMap": true,
 ```
 
 ###### sourceMap
+
 sourceMap：
+
 ```json
 "sourceMap": true, // 生成相应的 '.map' 文件
 ```
-
-
-
 
 {
 "compilerOptions": {
