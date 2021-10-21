@@ -154,6 +154,12 @@ References：是一种将 TypeScript 程序组织成更小的部分的方法。�
 ###### `allowUnreachableCode`
 
 allowUnreachableCode：是否允许出现无法访问的代码
+配置
+
+```json
+"allowUnreachableCode":false
+```
+
 可选值：
 
 - `undefined` `默认值` 向编辑提供建议作为警告
@@ -190,6 +196,12 @@ function fn(n: number) {
 ###### `allowUnusedLabels`
 
 allowUnusedLabels：是否运行使用未定义的字段
+配置
+
+```json
+"allowUnusedLabels":false
+```
+
 可选值：
 
 - `undefined` `默认值` 向编辑提供建议作为警告
@@ -203,6 +215,73 @@ function verifyAge(age: number) {
   if (age > 18) {
     verified: true; // 未定义verified字段
   }
+}
+```
+
+###### `alwaysStrict`
+
+alwaysStrict: 确保您的文件在 `ECMAScript` 严格模式下解析，并为每个源文件里面加入`use strict`
+严格模式是在 ES5 中引入的，它为 JavaScript 引擎的运行时提供行为调整以提高性能，并抛出一组错误而不是忽略它们
+
+```json
+"alwaysStrict": true
+```
+
+###### `exactOptionalPropertyTypes`
+
+exactOptionalPropertyTypes：启用`exactOptionalPropertyTypes`后，`TypeScript`会应用更严格的规则来验证属性的类型类型或`interfaces`具有?的属性，默认值为`false`
+配置
+
+```json
+"exactOptionalPropertyTypes":false
+```
+
+例如，接口中定义了一个属性可以是字符串：`dark`或`light`或者它该属性不存在对象中
+
+```javascript
+interface UserDefaults {
+  colorThemeOverride?: "dark" | "light";
+}
+```
+
+如果`exactOptionalPropertyTypes`设置为`false`，可以给`colorThemeOverride`设置 3 个值`dark`,`light`,和`undefined`
+将值设置成`undefined`大多数情况下`javaScript`检查是否存在的时候是失败的。但这不是很准确，实际上`colorThemeOverride`:`undefined`和`colorThemeOverride`属性不存在是不一样的。例如：属性没有定义和`undefined`，在使用`as`运算符时会有不同的结果。
+当`exactOptionalPropertyTypes`设置为`true`时，`TypeScript`在给可选属性赋值`undefined`时会出现以下错误。
+
+```javascript
+const settings = getUserSettings();
+settings.colorThemeOverride = "dark";
+settings.colorThemeOverride = "light";
+
+// But not:
+settings.colorThemeOverride = undefined;
+// error info: Type 'undefined' is not assignable to type '"dark" | "light"' with 'exactOptionalPropertyTypes: true'.
+// Consider adding 'undefined' to the type of the target.
+```
+
+    "noFallthroughCasesInSwitch": true,    // 报告 switch 语句的 fallthrough 错误。（即，不允许 switch 的 case 语句贯穿）
+
+###### `noFallthroughCasesInSwitch`
+
+noFallthroughCasesInSwitch：不允许 `switch` 的 `case` 语句贯穿，确保 `switch` 语句中的任何非空 `case` 包含 `break` 或 `return`
+配置
+
+```json
+"noFallthroughCasesInSwitch":true
+```
+
+示例：
+
+```javascript
+const a: number = 6;
+
+switch (a) {
+  case 0:
+    // error info: Fallthrough case in switch.
+    console.log("even");
+  case 1:
+    console.log("odd");
+    break;
 }
 ```
 
@@ -305,7 +384,6 @@ sourceMap：
     "noUnusedLocals": true,                // 有未使用的变量时，抛出错误
     "noUnusedParameters": true,            // 有未使用的参数时，抛出错误
     "noImplicitReturns": true,             // 并不是所有函数里的代码都有返回值时，抛出错误
-    "noFallthroughCasesInSwitch": true,    // 报告 switch 语句的 fallthrough 错误。（即，不允许 switch 的 case 语句贯穿）
 
     /* 模块解析选项 */
     "moduleResolution": "node",            // 选择模块解析策略： 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
