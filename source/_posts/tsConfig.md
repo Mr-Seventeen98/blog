@@ -259,8 +259,6 @@ settings.colorThemeOverride = undefined;
 // Consider adding 'undefined' to the type of the target.
 ```
 
-    "noFallthroughCasesInSwitch": true,    // 报告 switch 语句的 fallthrough 错误。（即，不允许 switch 的 case 语句贯穿）
-
 ###### `noFallthroughCasesInSwitch`
 
 noFallthroughCasesInSwitch：不允许 `switch` 的 `case` 语句贯穿，确保 `switch` 语句中的任何非空 `case` 包含 `break` 或 `return`
@@ -284,6 +282,71 @@ switch (a) {
     break;
 }
 ```
+
+###### `noImplicitAny`
+noImplicitAny：在表达式和声明上有隐含的`any`类型时报错
+配置
+
+```json
+"noImplicitAny":true
+```
+在某些情况下，当`TypeScript`无法推断出数据类型时候，会默认将变量的类型推断为`any`，可能会导致一些其他的错误。例如：
+```javascript
+function fn(s) {
+  console.log(s.subtr(3));
+}
+fn(42);
+```
+当配置了`noImplicitAny`为`true`时，`TypeScript`推断出`any`时候会抛出错误。例如：
+```javascript
+function fn(s) {
+  console.log(s.subtr(3)); // Parameter 's' implicitly has an 'any' type.
+}
+```
+
+###### `noImplicitOverride`
+noImplicitOverride：在使用类的继承时候，如果子类有重载父类的方法时，随着父类的方法改名，或者发生参数的变化时候，子类重载的方法和父类的方法造成了不统一。
+配置
+
+```json
+"noImplicitOverride":false
+```
+例如：
+```javascript
+class Album {
+  download() {
+    // Default behavior
+  }
+}
+ 
+class SharedAlbum extends Album {
+  download() {
+    // Override to get info from many sources
+  }
+}
+```
+当出于一些业务需求的时候父类的`download`方法需要重构成`setup`,在这种情况下`TypeScript`并没有任何提示说明`SharedAlbum`类中的`download`函数是要覆盖父类的`setup`函数
+```javascript
+class Album {
+  setup() {
+    // Default behavior
+  }
+}
+ 
+class MLAlbum extends Album {
+  setup() {
+    // Override to get info from algorithm
+  }
+}
+ 
+class SharedAlbum extends Album {
+  download() {
+    // Override to get info from many sources
+  }
+}
+```
+
+
 
 ##### 配置项详解
 
@@ -375,7 +438,6 @@ sourceMap：
 
     /* 严格的类型检查选项 */
     "strict": true,                        // 启用所有严格类型检查选项
-    "noImplicitAny": true,                 // 在表达式和声明上有隐含的 any类型时报错
     "strictNullChecks": true,              // 启用严格的 null 检查
     "noImplicitThis": true,                // 当 this 表达式值为 any 类型的时候，生成一个错误
     "alwaysStrict": true,                  // 以严格模式检查每个模块，并在每个文件里加入 'use strict'
