@@ -284,20 +284,25 @@ switch (a) {
 ```
 
 ###### `noImplicitAny`
+
 noImplicitAny：在表达式和声明上有隐含的`any`类型时报错
 配置
 
 ```json
 "noImplicitAny":true
 ```
+
 在某些情况下，当`TypeScript`无法推断出数据类型时候，会默认将变量的类型推断为`any`，可能会导致一些其他的错误。例如：
+
 ```javascript
 function fn(s) {
   console.log(s.subtr(3));
 }
 fn(42);
 ```
+
 当配置了`noImplicitAny`为`true`时，`TypeScript`推断出`any`时候会抛出错误。例如：
+
 ```javascript
 function fn(s) {
   console.log(s.subtr(3)); // Parameter 's' implicitly has an 'any' type.
@@ -305,46 +310,198 @@ function fn(s) {
 ```
 
 ###### `noImplicitOverride`
+
 noImplicitOverride：在使用类的继承时候，如果子类有重载父类的方法时，随着父类的方法改名，或者发生参数的变化时候，子类重载的方法和父类的方法造成了不统一。
 配置
 
 ```json
 "noImplicitOverride":false
 ```
+
 例如：
+
 ```javascript
 class Album {
   download() {
     // Default behavior
   }
 }
- 
+
 class SharedAlbum extends Album {
   download() {
     // Override to get info from many sources
   }
 }
 ```
+
 当出于一些业务需求的时候父类的`download`方法需要重构成`setup`,在这种情况下`TypeScript`并没有任何提示说明`SharedAlbum`类中的`download`函数是要覆盖父类的`setup`函数
+
 ```javascript
 class Album {
   setup() {
     // Default behavior
   }
 }
- 
+
 class MLAlbum extends Album {
   setup() {
     // Override to get info from algorithm
   }
 }
- 
+
 class SharedAlbum extends Album {
   download() {
     // Override to get info from many sources
   }
 }
 ```
+
+在这种情况下`TypeScript`没有任何警告或提示说明`SharedAlbum`类中的`download`是，重写父类的函数。
+
+将`noImplicitOverride`设置为`true`,子类重写的方法用`override`修饰，当父类发生变化时候，子类重写的方法会抛出错误，达到永远保持同步的效果。
+
+如果将`noImplicitOverride`设置为`true`,子类重写方法的时候不能缺少`override`修饰符，如果确实会抛出错误。例如：
+
+```javascript
+class Album {
+  setup() {}
+}
+
+class MLAlbum extends Album {
+  override setup() {}
+}
+
+class SharedAlbum extends Album {
+  setup() {}// error info: This member must have an 'override' modifier because it overrides a member in the base class 'Album'.
+}
+```
+
+###### noImplicitReturns
+
+noImplicitReturns：TypeScript 将检查函数中的所有代码是否都有返回值，当出现没有返回值的代码时候抛出错误（当函数的返回值为`void`时除外）,默认值为`false`
+配置
+
+```json
+"noImplicitReturns":false
+```
+
+例如：
+
+```javascript
+function lookupHeadphonesManufacturer(color: "blue" | "black"): string {
+  // error inf : Function lacks ending return statement and return type does not include 'undefined'.
+  if (color === "blue") {
+    return "beats";
+  } else {
+    ("bose");
+  }
+}
+```
+
+###### noImplicitThis
+noImplicitThis：在任何隐式为`any`类型的时候，使用`this`，抛出错误（当严格模式时候默认值为`true`，其他情况默认值为`false`）
+配置
+```json
+"noImplicitThis":true
+```
+例如：
+`width`和`height`在`getAreaFunction`函数内的匿名函数中隐式类型是`any`
+```javascript
+class Rectangle {
+  width: number;
+  height: number;
+ 
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
+ 
+  getAreaFunction() {
+    return function () {
+      return this.width * this.height;
+      // error info： 'this' implicitly has type 'any' because it does not have a type annotation.
+      // error info： 'this' implicitly has type 'any' because it does not have a type annotation.
+    };
+  }
+}
+```
+
+###### noPropertyAccessFromIndexSignature
+noPropertyAccessFromIndexSignature：此设置保证通过( obj.key) 语法访问字段和( obj["key"]) 来访问类型中声明的属性。当设置为`true`时访问一个不存在的属性时`TypeScript`会抛出一个错误。在调用对象属性时候，确保这个属性是存在的。
+配置
+```json
+"noPropertyAccessFromIndexSignature":false
+```
+例如：设置为`false`，`TypeScript`将允许访问没有定义的属性
+```javascript
+interface GameSettings {
+  // Known up-front properties
+  speed: "fast" | "medium" | "slow";
+  quality: "high" | "low";
+ 
+  // Assume anything unknown to the interface
+  // is a string.
+  [key: string]: string;
+}
+ 
+const settings = getSettings();
+settings.speed;
+settings.quality;
+// Unknown key accessors are allowed on
+// this object, and are `string`
+settings.username;
+```
+例如：设置为`true`，在`TypeScript`中访问对象未定义的属性时候，会抛出错误
+```javascript
+const settings = getSettings();
+settings.speed;
+settings.quality;
+ 
+// This would need to be settings["username"];
+settings.username;
+// error info : Property 'username' comes from an index signature, so it must be accessed with ['username'].
+```
+
+###### noUncheckedIndexedAccess
+noUncheckedIndexedAccess： `TypeScript` 有一种方法可以通过索引签名来访问对象的未知属性的值。
+配置
+```json
+"noUncheckedIndexedAccess":false
+```
+例如：
+```javascript
+interface EnvironmentVars {
+  NAME: string;
+  OS: string;
+  // Unknown properties are covered by this index signature.
+  [propName: string]: string;
+}
+
+declare const env: EnvironmentVars;
+
+// Declared as existing
+const sysName = env.NAME;
+const os = env.OS;
+// os: string
+// Not declared, but because of the index
+// signature, then it is considered a string
+const nodeEnv = env.NODE_ENV;
+// nodeEnv: string
+```
+例如：当将`noUncheckedIndexedAccess`设置为`true`时，对象中未声明的属性值将会是`undefined`。
+```javascript
+declare const env: EnvironmentVars;
+// Declared as existing
+const sysName = env.NAME;
+const os = env.OS;
+// os: string
+// Not declared, but because of the index
+// signature, then it is considered a string
+const nodeEnv = env.NODE_ENV;
+// nodeEnv: string | undefined
+```
+
+
 
 
 
@@ -439,13 +596,11 @@ sourceMap：
     /* 严格的类型检查选项 */
     "strict": true,                        // 启用所有严格类型检查选项
     "strictNullChecks": true,              // 启用严格的 null 检查
-    "noImplicitThis": true,                // 当 this 表达式值为 any 类型的时候，生成一个错误
     "alwaysStrict": true,                  // 以严格模式检查每个模块，并在每个文件里加入 'use strict'
 
     /* 额外的检查 */
     "noUnusedLocals": true,                // 有未使用的变量时，抛出错误
     "noUnusedParameters": true,            // 有未使用的参数时，抛出错误
-    "noImplicitReturns": true,             // 并不是所有函数里的代码都有返回值时，抛出错误
 
     /* 模块解析选项 */
     "moduleResolution": "node",            // 选择模块解析策略： 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
