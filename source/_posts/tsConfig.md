@@ -501,6 +501,95 @@ const nodeEnv = env.NODE_ENV;
 // nodeEnv: string | undefined
 ```
 
+###### noUnusedLocals
+noUnusedLocals：有未使用的变量时，抛出错误
+配置
+```json
+"noUnusedLocals": true
+```
+示例：
+```javascript
+const createKeyboard = (modelID: number) => {
+  const defaultModelID = 23;
+ // error info : 'defaultModelID' is declared but its value is never read.
+  return { type: "keyboard", modelID };
+};
+```
+
+###### noUnusedParameters
+noUnusedParameters：有未使用的参数时，抛出错误
+配置：
+```json
+"noUnusedParameters": true
+```
+示例：
+```javascript
+const createDefaultKeyboard = (modelID: number) => {
+ // error info : 'modelID' is declared but its value is never read.
+  const defaultModelID = 23;
+  return { type: "keyboard", modelID: defaultModelID };
+};
+```
+
+###### strict
+strict：启用所有严格类型检查选项
+配置
+```json
+"strict": true,
+```
+
+###### strictBindCallApply
+strictBindCallApply：TypeScript是否对函数的`call`,`bind`,`apply`的入参进行强类型校验，默认值（如果`strict`为`true`则为`true`，其他情况下为`false`）
+配置
+```json
+"strictBindCallApply":true
+```
+示例：
+```javascript
+// With strictBindCallApply on
+function fn(x: string) {
+  return parseInt(x);
+}
+ 
+const n1 = fn.call(undefined, "10");
+ 
+const n2 = fn.call(undefined, false);
+// error info : Argument of type 'boolean' is not assignable to parameter of type 'string'.
+```
+设置为`false`时候，表示可以是`any`类型
+```javascript
+// With strictBindCallApply off
+function fn(x: string) {
+  return parseInt(x);
+}
+ 
+// Note: No error; return type is 'any'
+const n = fn.call(undefined, false);
+```
+
+###### strictFunctionTypes
+strictFunctionTypes：
+配置
+```json
+
+```
+示例：
+```javascript
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -594,13 +683,10 @@ sourceMap：
 "isolatedModules": true, // 将每个文件作为单独的模块 （与 'ts.transpileModule' 类似）.
 
     /* 严格的类型检查选项 */
-    "strict": true,                        // 启用所有严格类型检查选项
     "strictNullChecks": true,              // 启用严格的 null 检查
     "alwaysStrict": true,                  // 以严格模式检查每个模块，并在每个文件里加入 'use strict'
 
     /* 额外的检查 */
-    "noUnusedLocals": true,                // 有未使用的变量时，抛出错误
-    "noUnusedParameters": true,            // 有未使用的参数时，抛出错误
 
     /* 模块解析选项 */
     "moduleResolution": "node",            // 选择模块解析策略： 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
