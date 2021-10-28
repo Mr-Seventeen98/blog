@@ -568,17 +568,125 @@ const n = fn.call(undefined, false);
 ```
 
 ###### strictFunctionTypes
-strictFunctionTypes：
+strictFunctionTypes ：启用此配置后将会检查函数参数的数据类型。默认值（如果`strict`为`true`则为`true`，其他情况下为`false`）
 配置
 ```json
-
+"strictFunctionTypes":true
 ```
 示例：
+- 设置为`false`的时候
 ```javascript
+function fn(x: string) {
+  console.log("Hello, " + x.toLowerCase());
+}
+ 
+type StringOrNumberFunc = (ns: string | number) => void;
+ 
+// Unsafe assignment
+let func: StringOrNumberFunc = fn;
+// Unsafe call - will crash
+func(10);
+```
+随着`strictFunctionTypes`设置为`true`，错误就会显示出来
+```javascript
+function fn(x: string) {
+  console.log("Hello, " + x.toLowerCase());
+}
+ 
+type StringOrNumberFunc = (ns: string | number) => void;
+ 
+// Unsafe assignment is prevented
+let func: StringOrNumberFunc = fn;
+// error info : Type '(x: string) => void' is not assignable to type 'StringOrNumberFunc'.
+// Types of parameters 'x' and 'ns' are incompatible.
+// Type 'string | number' is not assignable to type 'string'.
+// Type 'number' is not assignable to type 'string'.
+```
+这个功能呢在开发阶段可以提前帮我们检查语法上的错误包括DOM层次的一些不合理
+```javascript
+type Methodish = {
+  func(x: string | number): void;
+};
+ 
+function fn(x: string) {
+  console.log("Hello, " + x.toLowerCase());
+}
+ 
+// Ultimately an unsafe assignment, but not detected
+const m: Methodish = {
+  func: fn,
+};
+m.func(10);
 ```
 
+###### strictNullChecks
+strictNullChecks：启用严格的 null 检查，
+- 当`strictNullChecks`为`false`时，`null`和`undefined`会被语法忽略，导致运行时报错。
+- 当`strictNullChecks`为`true`时，`null`和`undefined`会有自己独特的类型，代码编译的时候就会提示错误。
+配置
+```json
+"strictNullChecks":true
+```
+示例
+例如用`find`函数不能保证查到对象，但是在后面对象中又用了对象的属性。
+```javascript
+declare const loggedInUsername: string;
+ 
+const users = [
+  { name: "Oby", age: 12 },
+  { name: "Heera", age: 32 },
+];
+ 
+const loggedInUser = users.find((u) => u.name === loggedInUsername);
+console.log(loggedInUser.age);
+```
+如果把`strictNullChecks`设置为`true`，编译的时候就会接受到一个错误（在使用`loggedInUser`前没有保证它是一定存在的）
+```javascript
+declare const loggedInUsername: string;
+ 
+const users = [
+  { name: "Oby", age: 12 },
+  { name: "Heera", age: 32 },
+];
+ 
+const loggedInUser = users.find((u) => u.name === loggedInUsername);
+console.log(loggedInUser.age);
+// error info : object is possibly 'undefined'.
+```
+如下两个列子看起来`find`永远是可以得到值的
+```javascript
+// 当 strictNullChecks: true
+type Array = {
+  find(predicate: (value: any, index: number) => boolean): S | undefined;
+};
+// 当 strictNullChecks: false 时候 undefined 默认从类型中移除,
+// 这个时候代码总是认为它能得到值的
+type Array = {
+  find(predicate: (value: any, index: number) => boolean): S;
+};
+```
 
-
+###### strictPropertyInitialization
+strictPropertyInitialization：定义的属性未赋默认值或者在构造函数中赋值时候会抛错误
+配置
+```json
+"strictPropertyInitialization":true
+```
+示例
+```javascript
+class UserAccount {
+  name: string;
+  accountType = "user";
+  email: string;
+// error info : Property 'email' has no initializer and is not definitely assigned in the constructor.
+  address: string | undefined;
+ 
+  constructor(name: string) {
+    this.name = name;
+    // Note that this.email is not set
+  }
+}
+```
 
 
 
@@ -683,7 +791,6 @@ sourceMap：
 "isolatedModules": true, // 将每个文件作为单独的模块 （与 'ts.transpileModule' 类似）.
 
     /* 严格的类型检查选项 */
-    "strictNullChecks": true,              // 启用严格的 null 检查
     "alwaysStrict": true,                  // 以严格模式检查每个模块，并在每个文件里加入 'use strict'
 
     /* 额外的检查 */
